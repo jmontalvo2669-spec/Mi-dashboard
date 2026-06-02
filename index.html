@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DistribuCot Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D0F14;--surface:#151821;--surface2:#1C2030;--border:#252A3A;
+  --gold:#E8A838;--gold2:#F5C842;--teal:#4ECDC4;--red:#FF6B6B;--green:#A8E6CF;
+  --text:#E8EAF0;--muted:#6B7280;--radius:14px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+h1,h2,h3,h4{font-family:'Syne',sans-serif}
+.nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;flex-wrap:wrap;gap:0;padding:0 24px;position:sticky;top:0;z-index:100}
+.nav-logo{display:flex;align-items:center;gap:10px;margin-right:24px;padding:14px 0}
+.logo-box{width:38px;height:38px;background:linear-gradient(135deg,#E8A838,#F5C842);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:#0D0F14}
+.nav-title{font-size:15px;font-weight:800;letter-spacing:-.3px}
+.nav-sub{font-size:10px;color:var(--muted)}
+.nav-tab{padding:16px 18px;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--muted);border-bottom:3px solid transparent;transition:all .2s;display:flex;align-items:center;gap:7px}
+.nav-tab:hover{color:var(--text)}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+.global-stat{text-align:right}
+.global-stat-num{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--gold)}
+.global-stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.page{display:none;max-width:1300px;margin:0 auto;padding:24px 16px}
+.page.active{display:block}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:18px}
+.card-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:900px){.grid-2{grid-template-columns:1fr}}
+.upload-zone{border:2px dashed var(--border);border-radius:12px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface2)}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--gold);background:rgba(232,168,56,.06)}
+.upload-icon{font-size:34px;margin-bottom:8px}
+.upload-zone h3{font-size:14px;font-weight:600;margin-bottom:4px}
+.upload-zone p{font-size:11px;color:var(--muted)}
+#fileIn{display:none}
+textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:13px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;resize:vertical;min-height:140px;outline:none;transition:border-color .2s;margin-top:12px}
+textarea:focus{border-color:var(--gold)}
+textarea::placeholder{color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s}
+.btn-gold{background:linear-gradient(135deg,#E8A838,#F5C842);color:#0D0F14}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(232,168,56,.3)}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.btn-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.ai-note{background:rgba(78,205,196,.06);border:1px solid rgba(78,205,196,.2);border-radius:8px;padding:9px 13px;font-size:12px;color:var(--teal);margin-top:10px}
+.quoter-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.quoter-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:15px}
+.quoter-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:#0D0F14;flex-shrink:0}
+.quoter-name{font-weight:600;font-size:14px}
+.quoter-meta{font-size:11px;color:var(--muted)}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:10px}
+.progress-fill{height:100%;border-radius:2px;transition:width .6s ease}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:3px 7px;font-size:11px;margin:2px}
+.chip-lines{background:rgba(232,168,56,.15);color:var(--gold);border-radius:4px;padding:1px 5px;font-size:10px;font-weight:600}
+.diff-easy{background:rgba(168,230,207,.15);color:var(--green);border-radius:4px;padding:1px 5px;font-size:10px;font-weight:600;display:inline-block}
+.diff-med{background:rgba(232,168,56,.15);color:var(--gold);border-radius:4px;padding:1px 5px;font-size:10px;font-weight:600;display:inline-block}
+.diff-hard{background:rgba(255,107,107,.15);color:var(--red);border-radius:4px;padding:1px 5px;font-size:10px;font-weight:600;display:inline-block}
+.orders-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.order-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.order-main{display:grid;grid-template-columns:1fr 90px 60px 80px 130px 36px;gap:12px;align-items:center;padding:13px 16px;cursor:pointer}
+@media(max-width:750px){.order-main{grid-template-columns:1fr 1fr;gap:8px}}
+.order-company{font-weight:600;font-size:14px}
+.order-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.tag{display:inline-flex;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:500}
+.tag-large{background:rgba(255,107,107,.12);color:var(--red)}
+.tag-medium{background:rgba(232,168,56,.12);color:var(--gold)}
+.tag-small{background:rgba(168,230,207,.12);color:var(--green)}
+.lines-cell{text-align:center}
+.lines-cell strong{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;display:block}
+.lines-cell small{font-size:10px;color:var(--muted)}
+.assigned-cell{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.order-expand{color:var(--muted);font-size:12px;text-align:center}
+.order-detail{display:none;padding:13px 16px;border-top:1px solid var(--border);background:var(--surface2);font-size:13px;line-height:1.7}
+.order-detail.open{display:block}
+.detail-label{font-size:11px;color:var(--teal);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.loader-wrap{padding:40px;text-align:center}
+.spinner{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{color:var(--muted);font-size:14px}
+.empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
+.empty-state .ei{font-size:44px;margin-bottom:12px}
+.alert-error{padding:12px 16px;border-radius:10px;font-size:13px;margin-top:12px;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);color:var(--red);display:none}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:18px}
+@media(max-width:800px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.kpi-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.kpi-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:var(--gold)}
+.kpi-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.seller-row{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:18px}
+@media(max-width:900px){.seller-row{grid-template-columns:repeat(2,1fr)}}
+.seller-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.seller-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.seller-name{font-weight:700;font-size:15px}
+.seller-orders{font-size:12px;color:var(--muted)}
+.seller-stat{margin-bottom:10px}
+.seller-stat-label{font-size:11px;color:var(--muted);margin-bottom:3px}
+.seller-stat-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.seller-stat-fill{height:100%;border-radius:3px}
+.seller-stat-val{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;margin-bottom:2px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px}
+@media(max-width:1000px){.grid-3{grid-template-columns:1fr 1fr}}
+@media(max-width:650px){.grid-3{grid-template-columns:1fr}}
+.history-table{width:100%;border-collapse:collapse;font-size:13px}
+.history-table th{text-align:left;padding:9px 13px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border)}
+.history-table td{padding:10px 13px;border-bottom:1px solid rgba(37,42,58,.5)}
+.history-table tr:hover td{background:var(--surface2)}
+.badge-easy{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;background:rgba(168,230,207,.15);color:var(--green)}
+.badge-med{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;background:rgba(232,168,56,.15);color:var(--gold)}
+.badge-hard{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;background:rgba(255,107,107,.15);color:var(--red)}
+.pct-pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.section-title{font-size:17px;font-weight:800;margin-bottom:3px;font-family:'Syne',sans-serif}
+.section-sub{font-size:13px;color:var(--muted);margin-bottom:18px}
+.filter-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filter-row select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none}
+.filter-row select:focus{border-color:var(--gold)}
+.eq-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.equity-item{margin-bottom:14px}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-logo">
+    <div class="logo-box">CQ</div>
+    <div>
+      <div class="nav-title">DistribuCot Pro</div>
+      <div class="nav-sub">Distribución inteligente de cotizaciones</div>
+    </div>
+  </div>
+  <button class="nav-tab active" onclick="showPage('distribuir',this)">📥 Distribuir</button>
+  <button class="nav-tab" onclick="showPage('dashboard',this)">📊 Dashboard</button>
+  <div class="nav-right" id="navStats" style="display:none">
+    <div class="global-stat"><div class="global-stat-num" id="navTotal">0</div><div class="global-stat-label">Pedidos hoy</div></div>
+    <div class="global-stat"><div class="global-stat-num" id="navLines">0</div><div class="global-stat-label">Líneas hoy</div></div>
+    <div class="global-stat"><div class="global-stat-num" id="navValue">$0</div><div class="global-stat-label">Valor est.</div></div>
+  </div>
+</div>
+
+<!-- API KEY BANNER -->
+<div id="apiBanner" style="display:none;background:rgba(255,107,107,.1);border-bottom:1px solid rgba(255,107,107,.3);padding:10px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+  <span style="color:#FF6B6B;font-size:13px;font-weight:600">🔑 Ingresa tu Anthropic API Key para usar la IA:</span>
+  <input id="apiKeyInput" type="password" placeholder="sk-ant-api03-..." style="flex:1;min-width:260px;background:#1C2030;border:1px solid rgba(255,107,107,.4);border-radius:8px;padding:7px 12px;color:#E8EAF0;font-family:'DM Sans',sans-serif;font-size:13px;outline:none"/>
+  <button onclick="saveApiKey()" style="background:linear-gradient(135deg,#E8A838,#F5C842);color:#0D0F14;border:none;border-radius:8px;padding:8px 16px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Guardar</button>
+  <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:#6B7280;font-size:11px">Obtener key →</a>
+</div>
+
+<!-- PAGE: DISTRIBUIR -->
+<div class="page active" id="page-distribuir">
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title"><span>📥</span> Ingresar Pedidos</div>
+        <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileIn').click()">
+          <input type="file" id="fileIn" accept=".txt,.csv,.eml" onchange="handleFileInput(this)"/>
+          <div class="upload-icon">📂</div>
+          <h3>Arrastra el email o archivo aquí</h3>
+          <p>.txt · .csv · .eml — o escribe / pega abajo</p>
+        </div>
+        <textarea id="rawInput" placeholder="Pega aquí el contenido del email o pedido:
+
+Ej:
+Empresa: PETROECUADOR EP
+Pedido #1234
+- Válvulas de bola 2&quot; (x20)
+- Filtros de combustible (x50)
+- Mangueras hidráulicas (x15)
+..."></textarea>
+        <div class="btn-row">
+          <button class="btn btn-gold" id="analyzeBtn" onclick="analyzeAndDistribute()">🤖 Analizar y Distribuir</button>
+          <button class="btn btn-ghost" onclick="clearAll()">🗑 Limpiar</button>
+        </div>
+        <div class="ai-note">🧠 La IA identifica la empresa, evalúa dificultad de productos y distribuye equitativamente por líneas entre las 4 cotizadoras.</div>
+        <div id="errorBox" class="alert-error"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-title"><span>👥</span> Panel de Cotizadoras</div>
+        <div id="quoterBoard">
+          <div class="empty-state"><div class="ei">📊</div><p>Ingresa pedidos para ver la distribución</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="ordersSection" style="display:none">
+    <div class="orders-header">
+      <div class="card-title" style="margin:0"><span>📋</span> Detalle de Pedidos Distribuidos</div>
+      <button class="btn btn-ghost" style="font-size:12px" onclick="exportCSV()">⬇ Exportar CSV</button>
+    </div>
+    <div id="ordersList"></div>
+  </div>
+</div>
+
+<!-- PAGE: DASHBOARD -->
+<div class="page" id="page-dashboard">
+  <div class="section-title">Dashboard de Seguimiento</div>
+  <div class="section-sub">Acumulado de todas las sesiones guardadas en este navegador</div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Total Pedidos</div><div class="kpi-val" id="kpiPedidos">0</div><div class="kpi-sub">Histórico total</div></div>
+    <div class="kpi"><div class="kpi-label">Total Líneas</div><div class="kpi-val" id="kpiLineas">0</div><div class="kpi-sub">Acumulado</div></div>
+    <div class="kpi"><div class="kpi-label">Valor Estimado</div><div class="kpi-val" id="kpiValor">$0</div><div class="kpi-sub">Total acumulado</div></div>
+    <div class="kpi"><div class="kpi-label">Cotizadoras</div><div class="kpi-val">4</div><div class="kpi-sub">Ariana · Licet · Meli · Nueva</div></div>
+  </div>
+  <div class="seller-row" id="sellerCards"></div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title"><span>📏</span> Líneas por Vendedora</div>
+      <div id="chartLinesWrap"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span>💵</span> Valor Est. por Vendedora</div>
+      <div id="chartValueWrap"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span>📦</span> Pedidos por Vendedora</div>
+      <div id="chartOrdersWrap"></div>
+    </div>
+  </div>
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-title"><span>⚖️</span> Dificultad de Pedidos</div>
+      <div id="chartDiffWrap" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span>🎯</span> Equidad de Carga (%)</div>
+      <div id="equityDetail" style="margin-top:4px"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="orders-header">
+      <div class="card-title" style="margin:0"><span>🗂</span> Historial de Pedidos</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <div class="filter-row" style="margin:0">
+          <select id="filterSeller" onchange="renderHistory()">
+            <option value="">Todas las vendedoras</option>
+            <option>Ariana</option><option>Licet</option><option>Meli</option><option>Nueva</option>
+          </select>
+          <select id="filterDiff" onchange="renderHistory()">
+            <option value="">Toda dificultad</option>
+            <option value="easy">Fácil</option><option value="med">Medio</option><option value="hard">Difícil</option>
+          </select>
+        </div>
+        <button class="btn btn-ghost" style="font-size:12px" onclick="exportHistoryCSV()">⬇ Exportar</button>
+        <button class="btn btn-ghost" style="font-size:12px;color:var(--red)" onclick="clearHistory()">🗑 Borrar todo</button>
+      </div>
+    </div>
+    <div id="historyTableWrap"></div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ─────────────────────────────────────────────────────────────────────
+let API_KEY = localStorage.getItem('distribucot_apikey')||'';
+
+function saveApiKey(){
+  const val=document.getElementById('apiKeyInput').value.trim();
+  if(!val){alert('Pega tu API key primero.');return;}
+  localStorage.setItem('distribucot_apikey',val);
+  API_KEY=val;
+  document.getElementById('apiBanner').style.display='none';
+  alert('✅ API Key guardada. Ya puedes usar la IA.');
+}
+
+function checkApiKey(){
+  if(!localStorage.getItem('distribucot_apikey')){
+    document.getElementById('apiBanner').style.display='flex';
+  }
+}
+window.addEventListener('DOMContentLoaded',checkApiKey);
+
+const QUOTERS = [
+  {id:1,name:"Ariana",av:"AR",color:"#E8A838"},
+  {id:2,name:"Licet", av:"LI",color:"#4ECDC4"},
+  {id:3,name:"Meli",  av:"ME",color:"#FF6B6B"},
+  {id:4,name:"Nueva", av:"NU",color:"#A8E6CF"},
+];
+
+let currentOrders = [];
+
+// ── STORAGE ────────────────────────────────────────────────────────────────────
+function getHistory(){try{return JSON.parse(localStorage.getItem('distribucot_history')||'[]');}catch(e){return[];}}
+function saveToHistory(orders){
+  const h=getHistory();
+  const date=new Date().toLocaleString('es-EC',{dateStyle:'short',timeStyle:'short'});
+  orders.forEach(o=>h.push({date,company:o.company,summary:o.summary,lines:o.lines,size:o.size,difficulty:o.difficulty,value:o.estimatedValue||0,seller:o.assignedTo}));
+  localStorage.setItem('distribucot_history',JSON.stringify(h));
+}
+function clearHistory(){
+  if(confirm('¿Borrar todo el historial? Esta acción no se puede deshacer.')){
+    localStorage.removeItem('distribucot_history');
+    renderDashboard();
+  }
+}
+
+// ── NAVIGATION ─────────────────────────────────────────────────────────────────
+function showPage(id,tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  tab.classList.add('active');
+  if(id==='dashboard') renderDashboard();
+}
+
+// ── DRAG & DROP ────────────────────────────────────────────────────────────────
+const dz=document.getElementById('dropZone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{
+  e.preventDefault();dz.classList.remove('drag');
+  const f=e.dataTransfer.files[0];
+  if(f){const r=new FileReader();r.onload=ev=>{document.getElementById('rawInput').value=ev.target.result;};r.readAsText(f);}
+});
+function handleFileInput(el){
+  const f=el.files[0];if(!f)return;
+  const r=new FileReader();r.onload=ev=>{document.getElementById('rawInput').value=ev.target.result;};r.readAsText(f);
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────────────────
+function parseRawOrders(text){
+  const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>2);
+  if(!lines.length)return[];
+  const orders=[];let cur=null;
+  for(const line of lines){
+    const isNew=/^(pedido|orden|cotizaci[oó]n|rfq|solicitud|empresa|compa[ñn]|cliente?)\s*[:#]/i.test(line)
+      ||/^\d+[\.\-\)]\s+[A-Z]/.test(line)
+      ||(line.length<70&&/[A-ZÁÉÍÓÚ]{3,}/.test(line)&&!/^[-•*]/.test(line));
+    if(isNew&&cur){orders.push(cur);cur=null;}
+    if(!cur)cur={header:line,lines:1,items:[line]};
+    else{cur.lines++;cur.items.push(line);}
+  }
+  if(cur)orders.push(cur);
+  if(!orders.length)return[{header:lines[0],lines:lines.length,items:lines}];
+  return orders;
+}
+
+function balanceAssign(orders){
+  const sorted=[...orders].sort((a,b)=>b.lines-a.lines);
+  const load=QUOTERS.map(q=>({...q,total:0}));
+  return sorted.map(o=>{
+    const min=load.reduce((m,q)=>q.total<m.total?q:m,load[0]);
+    min.total+=o.lines;
+    return{...o,assignedTo:QUOTERS.find(q=>q.id===min.id).name};
+  });
+}
+
+// ── MAIN ANALYZE ───────────────────────────────────────────────────────────────
+async function analyzeAndDistribute(){
+  const text=document.getElementById('rawInput').value.trim();
+  if(!text){showError('Escribe o pega el contenido del pedido primero.');return;}
+  hideError();setLoading(true);
+  API_KEY=localStorage.getItem('distribucot_apikey')||'';
+  if(!API_KEY){
+    setLoading(false);
+    document.getElementById('apiBanner').style.display='flex';
+    showError('Configura tu API Key primero (ver banner arriba).');
+    return;
+  }
+  const parsed=parseRawOrders(text);
+  const prompt=`Eres un experto en análisis de cotizaciones comerciales en Ecuador y Latinoamérica.
+
+Analiza este texto con ${parsed.length} pedido(s) y devuelve SOLO JSON válido, sin markdown, sin explicaciones.
+
+TEXTO:
+${text}
+
+Por cada pedido identifica:
+- company: nombre empresa/cliente (infiere si falta, usa "Cliente #N")
+- summary: descripción breve max 80 chars
+- lines: número de ítems/líneas a cotizar (número entero, estima si no está explícito)
+- size: "small" (<20 líneas), "medium" (20-100 líneas), "large" (>100 líneas o empresa grande)
+- difficulty: "easy" (productos comunes), "med" (requiere búsqueda), "hard" (productos especializados, importación compleja)
+- estimatedValue: valor estimado en USD como número entero (0 si no hay forma de estimarlo)
+- analysis: párrafo 2-3 oraciones sobre la empresa, tipo de pedido y recomendación
+- reasoning: frase corta explicando la asignación
+
+Responde ÚNICAMENTE con este JSON:
+{"orders":[{"company":"","summary":"","lines":0,"size":"small","difficulty":"easy","estimatedValue":0,"analysis":"","reasoning":""}]}`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':API_KEY,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    if(!res.ok)throw new Error('API '+res.status);
+    const data=await res.json();
+    const rawT=(data.content||[]).map(b=>b.text||'').join('').trim();
+    const clean=rawT.replace(/```json|```/g,'').trim();
+    const jStart=clean.indexOf('{');const jEnd=clean.lastIndexOf('}');
+    const parsed2=JSON.parse(clean.substring(jStart,jEnd+1));
+    let orders=(parsed2.orders||[]).map((d,i)=>({
+      ...d,
+      lines:(typeof d.lines==='number'&&d.lines>0)?d.lines:(parsed[i]?.lines||1),
+      estimatedValue:d.estimatedValue||0
+    }));
+    const distributed=balanceAssign(orders);
+    currentOrders=distributed;
+    saveToHistory(distributed);
+    renderResults(distributed);
+  }catch(e){
+    console.error(e);
+    showError('Error al analizar. Verifica tu conexión a internet e intenta de nuevo. Detalle: '+e.message);
+  }
+  setLoading(false);
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────────────
+function renderResults(orders){
+  renderQuoterBoard(orders);
+  renderOrdersList(orders);
+  updateNavStats(orders);
+  document.getElementById('ordersSection').style.display='block';
+}
+
+function renderQuoterBoard(orders){
+  const totals=QUOTERS.map(q=>{
+    const mine=orders.filter(o=>o.assignedTo===q.name);
+    return{...q,myOrders:mine,totalLines:mine.reduce((s,o)=>s+o.lines,0),totalValue:mine.reduce((s,o)=>s+(o.estimatedValue||0),0)};
+  });
+  const maxL=Math.max(...totals.map(t=>t.totalLines),1);
+  document.getElementById('quoterBoard').innerHTML='<div class="quoter-grid">'+totals.map(q=>`
+    <div class="quoter-card">
+      <div class="quoter-head">
+        <div class="avatar" style="background:${q.color}">${q.av}</div>
+        <div><div class="quoter-name">${q.name}</div>
+        <div class="quoter-meta">${q.myOrders.length} pedidos · ${q.totalLines} líneas · $${q.totalValue.toLocaleString()}</div></div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${(q.totalLines/maxL*100).toFixed(1)}%;background:${q.color}"></div></div>
+      <div>${q.myOrders.length>0?q.myOrders.map(o=>`
+        <span class="chip">${o.company.split(' ')[0]}
+          <span class="chip-lines">${o.lines}L</span>
+          <span class="diff-${o.difficulty}">${o.difficulty==='easy'?'●':o.difficulty==='med'?'◑':'○'}</span>
+        </span>`).join(''):'<span style="color:var(--muted);font-size:11px">Sin pedidos</span>'}
+      </div>
+    </div>`).join('')+'</div>';
+}
+
+function renderOrdersList(orders){
+  const diffLabel={easy:'Fácil',med:'Medio',hard:'Difícil'};
+  const sizeLabel={small:'Pequeña',medium:'Mediana',large:'Grande'};
+  document.getElementById('ordersList').innerHTML=orders.map((o,i)=>{
+    const q=QUOTERS.find(q=>q.name===o.assignedTo)||QUOTERS[0];
+    return`<div class="order-item">
+      <div class="order-main" onclick="toggleDetail(${i})">
+        <div><div class="order-company">${o.company}</div><div class="order-desc">${o.summary}</div></div>
+        <div><span class="tag tag-${o.size}">${sizeLabel[o.size]||o.size}</span></div>
+        <div class="lines-cell"><strong>${o.lines}</strong><small>líneas</small></div>
+        <div><span class="diff-${o.difficulty}" style="padding:4px 9px;border-radius:6px;font-size:12px">${diffLabel[o.difficulty]||o.difficulty}</span></div>
+        <div class="assigned-cell"><div class="dot" style="background:${q.color}"></div>${q.name}<span style="color:var(--muted);font-size:13px">&nbsp;$${(o.estimatedValue||0).toLocaleString()}</span></div>
+        <div class="order-expand" id="arrow-${i}">▼</div>
+      </div>
+      <div class="order-detail" id="detail-${i}">
+        <div class="detail-label">🤖 Análisis IA</div>
+        <p style="margin-bottom:10px">${o.analysis||'—'}</p>
+        <div class="detail-label">⚖️ Razón de Asignación</div>
+        <p style="color:var(--muted)">${o.reasoning||'—'}</p>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDetail(i){
+  const d=document.getElementById('detail-'+i);
+  const a=document.getElementById('arrow-'+i);
+  const open=d.classList.toggle('open');
+  a.textContent=open?'▲':'▼';
+}
+
+function updateNavStats(orders){
+  document.getElementById('navStats').style.display='flex';
+  document.getElementById('navTotal').textContent=orders.length;
+  document.getElementById('navLines').textContent=orders.reduce((s,o)=>s+o.lines,0);
+  document.getElementById('navValue').textContent='$'+orders.reduce((s,o)=>s+(o.estimatedValue||0),0).toLocaleString();
+}
+
+// ── DASHBOARD ──────────────────────────────────────────────────────────────────
+function renderDashboard(){
+  const history=getHistory();
+  const histTotal=history.length;
+  const histLines=history.reduce((s,o)=>s+o.lines,0);
+  const histValue=history.reduce((s,o)=>s+(o.value||0),0);
+  document.getElementById('kpiPedidos').textContent=histTotal;
+  document.getElementById('kpiLineas').textContent=histLines.toLocaleString();
+  document.getElementById('kpiValor').textContent='$'+histValue.toLocaleString();
+
+  const sellers=QUOTERS.map(q=>{
+    const mine=history.filter(o=>o.seller===q.name);
+    return{...q,count:mine.length,lines:mine.reduce((s,o)=>s+o.lines,0),value:mine.reduce((s,o)=>s+(o.value||0),0),hard:mine.filter(o=>o.difficulty==='hard').length,large:mine.filter(o=>o.size==='large').length};
+  });
+  const maxSellerLines=Math.max(...sellers.map(s=>s.lines),1);
+  const maxSellerValue=Math.max(...sellers.map(s=>s.value),1);
+  const maxSellerCount=Math.max(...sellers.map(s=>s.count),1);
+
+  // Seller cards
+  document.getElementById('sellerCards').innerHTML=sellers.map(s=>{
+    const linePct=histTotal>0?((s.lines/histLines)*100).toFixed(1):0;
+    const valPct=histTotal>0?((s.value/(histValue||1))*100).toFixed(1):0;
+    return`<div class="seller-card">
+      <div class="seller-head">
+        <div class="avatar" style="background:${s.color};width:42px;height:42px;font-size:13px">${s.av}</div>
+        <div><div class="seller-name">${s.name}</div><div class="seller-orders">${s.count} pedidos</div></div>
+      </div>
+      <div class="seller-stat">
+        <div class="seller-stat-label">Líneas cotizadas</div>
+        <div class="seller-stat-val" style="color:${s.color}">${s.lines.toLocaleString()}</div>
+        <div class="seller-stat-bar"><div class="seller-stat-fill" style="width:${(s.lines/maxSellerLines*100).toFixed(1)}%;background:${s.color}"></div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${linePct}% del total</div>
+      </div>
+      <div class="seller-stat">
+        <div class="seller-stat-label">Valor estimado</div>
+        <div class="seller-stat-val" style="color:${s.color}">$${s.value.toLocaleString()}</div>
+        <div class="seller-stat-bar"><div class="seller-stat-fill" style="width:${(s.value/maxSellerValue*100).toFixed(1)}%;background:${s.color}"></div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${valPct}% del total</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <span class="badge-hard">Difíciles: ${s.hard}</span>
+        <span style="background:rgba(255,107,107,.12);color:var(--red);display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px">Grandes: ${s.large}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Bar charts (SVG)
+  function barChart(containerId, sellers, field){
+    const max=Math.max(...sellers.map(s=>s[field]),1);
+    document.getElementById(containerId).innerHTML=sellers.map(s=>`
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px">
+          <span style="color:var(--text);font-weight:600">${s.name}</span>
+          <span style="color:${s.color};font-family:'Syne',sans-serif;font-weight:700">${field==='value'?'$'+s[field].toLocaleString():s[field].toLocaleString()}</span>
+        </div>
+        <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:${(s[field]/max*100).toFixed(1)}%;background:${s.color};border-radius:3px;transition:width .6s ease"></div>
+        </div>
+      </div>`).join('');
+  }
+  barChart('chartLinesWrap', sellers, 'lines');
+  barChart('chartValueWrap', sellers, 'value');
+  barChart('chartOrdersWrap', sellers, 'count');
+
+  // Donut chart
+  const easy=history.filter(o=>o.difficulty==='easy').length;
+  const med=history.filter(o=>o.difficulty==='med').length;
+  const hard=history.filter(o=>o.difficulty==='hard').length;
+  const total2=easy+med+hard||1;
+  const dColors=['#A8E6CF','#E8A838','#FF6B6B'];
+  const dLabels=['Fácil','Medio','Difícil'];
+  const dData=[easy,med,hard];
+  const cx=80,cy=80,r=60,sw=22,circ=2*Math.PI*r;
+  let cum=0;
+  const slices=dData.map((v,i)=>{
+    const pct=v/total2;
+    const offset=circ*(1-cum);
+    const dash=circ*pct;
+    cum+=pct;
+    return{dash,offset,color:dColors[i],label:dLabels[i],value:v};
+  });
+  document.getElementById('chartDiffWrap').innerHTML=`
+    <svg width="160" height="160" viewBox="0 0 160 160">
+      ${slices.map(s=>`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.color}" stroke-width="${sw}"
+        stroke-dasharray="${s.dash} ${circ-s.dash}" stroke-dashoffset="${s.offset}"
+        style="transform:rotate(-90deg);transform-origin:center"/>`).join('')}
+      <circle cx="${cx}" cy="${cy}" r="${r-sw/2-2}" fill="var(--surface2)"/>
+      <text x="${cx}" y="${cy+5}" text-anchor="middle" fill="var(--gold)" font-family="Syne" font-weight="700" font-size="20">${total2}</text>
+    </svg>
+    <div>${slices.map(s=>`
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:${s.color};flex-shrink:0"></div>
+        <span style="color:var(--text)">${s.label}</span>
+        <span style="color:${s.color};font-weight:600;margin-left:auto;padding-left:12px">${s.value}</span>
+      </div>`).join('')}
+    </div>`;
+
+  // Equity
+  const avgLines=histLines/4||1;
+  document.getElementById('equityDetail').innerHTML=sellers.map(s=>{
+    const pct=histTotal>0?((s.lines/histLines)*100).toFixed(1):25;
+    const diff=((s.lines-avgLines)/avgLines*100).toFixed(0);
+    const diffColor=Math.abs(diff)<15?'var(--green)':Math.abs(diff)<30?'var(--gold)':'var(--red)';
+    return`<div class="equity-item">
+      <div class="eq-row">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="avatar" style="background:${s.color};width:26px;height:26px;font-size:10px">${s.av}</div>
+          <span style="font-weight:600;font-size:14px">${s.name}</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="pct-pill" style="background:${s.color}22;color:${s.color}">${pct}%</span>
+          <span style="font-size:12px;color:${diffColor}">${diff>0?'+':''}${diff}% vs promedio</span>
+        </div>
+      </div>
+      <div class="progress-bar" style="height:8px">
+        <div class="progress-fill" style="width:${pct}%;background:${s.color}"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  renderHistory();
+}
+
+function renderHistory(){
+  const history=getHistory();
+  const seller=document.getElementById('filterSeller').value;
+  const diff=document.getElementById('filterDiff').value;
+  const filtered=history.filter(o=>(seller?o.seller===seller:true)&&(diff?o.difficulty===diff:true));
+  const diffLabel={easy:'<span class="badge-easy">Fácil</span>',med:'<span class="badge-med">Medio</span>',hard:'<span class="badge-hard">Difícil</span>'};
+  const sizeLabel={small:'Pequeña',medium:'Mediana',large:'Grande'};
+  if(!filtered.length){
+    document.getElementById('historyTableWrap').innerHTML='<div class="empty-state" style="padding:30px"><div class="ei">📭</div><p>Sin registros aún.</p></div>';
+    return;
+  }
+  const rows=[...filtered].reverse().map(o=>{
+    const q=QUOTERS.find(q=>q.name===o.seller)||QUOTERS[0];
+    return`<tr>
+      <td style="color:var(--muted)">${o.date}</td>
+      <td><strong>${o.company}</strong><div style="font-size:11px;color:var(--muted)">${o.summary}</div></td>
+      <td><span style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px">${o.lines}</span></td>
+      <td>${sizeLabel[o.size]||o.size}</td>
+      <td>${diffLabel[o.difficulty]||o.difficulty}</td>
+      <td style="font-weight:600">$${(o.value||0).toLocaleString()}</td>
+      <td><div style="display:flex;align-items:center;gap:6px"><div class="dot" style="background:${q.color}"></div><strong>${o.seller}</strong></div></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('historyTableWrap').innerHTML=`
+    <table class="history-table">
+      <thead><tr><th>Fecha</th><th>Empresa</th><th>Líneas</th><th>Tamaño</th><th>Dificultad</th><th>Valor Est.</th><th>Vendedora</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ── UTILITIES ──────────────────────────────────────────────────────────────────
+function exportCSV(){
+  if(!currentOrders.length)return;
+  const rows=[['Empresa','Resumen','Líneas','Tamaño','Dificultad','Valor Est.','Asignada']].concat(
+    currentOrders.map(o=>[`"${o.company}"`,`"${o.summary}"`,o.lines,o.size,o.difficulty,o.estimatedValue||0,`"${o.assignedTo}"`])
+  ).map(r=>r.join(',')).join('\n');
+  download(rows,'distribucion_'+new Date().toISOString().slice(0,10)+'.csv','text/csv');
+}
+function exportHistoryCSV(){
+  const h=getHistory();if(!h.length)return;
+  const rows=[['Fecha','Empresa','Resumen','Líneas','Tamaño','Dificultad','Valor Est.','Vendedora']].concat(
+    h.map(o=>[`"${o.date}"`,`"${o.company}"`,`"${o.summary}"`,o.lines,o.size,o.difficulty,o.value||0,`"${o.seller}"`])
+  ).map(r=>r.join(',')).join('\n');
+  download(rows,'historial_distribucot_'+new Date().toISOString().slice(0,10)+'.csv','text/csv');
+}
+function download(content,filename,type){
+  const a=document.createElement('a');
+  a.href='data:'+type+';charset=utf-8,'+encodeURIComponent(content);
+  a.download=filename;a.click();
+}
+function clearAll(){
+  document.getElementById('rawInput').value='';
+  currentOrders=[];
+  document.getElementById('quoterBoard').innerHTML='<div class="empty-state"><div class="ei">📊</div><p>Ingresa pedidos para ver la distribución</p></div>';
+  document.getElementById('ordersSection').style.display='none';
+  document.getElementById('navStats').style.display='none';
+  hideError();
+}
+function setLoading(on){
+  const btn=document.getElementById('analyzeBtn');
+  if(on){
+    document.getElementById('quoterBoard').innerHTML='<div class="loader-wrap"><div class="spinner"></div><div class="loader-text">Analizando con IA…</div></div>';
+    btn.disabled=true;btn.textContent='⏳ Analizando...';
+  }else{
+    btn.disabled=false;btn.innerHTML='🤖 Analizar y Distribuir';
+  }
+}
+function showError(msg){const el=document.getElementById('errorBox');el.textContent='⚠️ '+msg;el.style.display='block';}
+function hideError(){document.getElementById('errorBox').style.display='none';}
+</script>
+</body>
+</html>
